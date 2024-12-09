@@ -37,6 +37,7 @@ void report_solution() {
     printf("%u, ", sol[i]);
   }
   printf("\n");
+  fflush(stdout);
 }
 
 void remove_last() {
@@ -63,6 +64,10 @@ void backtrack(I N, I M) {
       remove_last();
       continue;
     }
+    if (active == 3) {
+      printf("trying %u %u %u, next %u\n", sol[0], sol[1], sol[2], next);
+      fflush(stdout);
+    }
     if (try_append(next) != 0) {
       next--;
       continue;
@@ -77,5 +82,5 @@ void backtrack(I N, I M) {
 }
 
 int main() {
-  backtrack(9, 161);
+  backtrack(10, 309);
 }
