@@ -6,26 +6,25 @@ using namespace std;
 
 #define active (sol.size())
 
-vector<I> sol;
-vector<set<I>> sets;
+I on[1234];
 
-int exists(I x) {
-  for (I i=0;i<active+1;i++) {
-    if (sets[i].count(x)) {
-      return 1;
-    }
-  }
-  return 0;
-}
+vector<I> sol;
+vector<vector<I>> vecs;
 
 int try_append(I x) {
-  sets[active+1].clear();
+  vecs[active+1].clear();
   for (I i=0;i<active+1;i++) {
-    for (I v:sets[i]) {
-      if (exists(x+v)) {
+    for (I v:vecs[i]) {
+      I here=x+v;
+      if (on[here]) {
+        for (I d:vecs[active+1]) {
+          on[d] = 0;
+        }
+        vecs[active+1].clear();
         return -1;
       }
-      sets[active+1].insert(x+v);
+      vecs[active+1].push_back(here);
+      on[here]=1;
     }
   }
   return 0;
@@ -38,10 +37,18 @@ void report_solution() {
   printf("\n");
 }
 
+void remove_last() {
+  for (I v:vecs[active]) {
+    on[v] = 0;
+  }
+  sol.pop_back();
+}
+
 void backtrack(I N, I M) {
-  sets.clear();
-  sets.resize(N+1);
-  sets[0] = {0};
+  vecs.clear();
+  vecs.resize(N+1);
+  vecs[0] = {0};
+  on[0] = 1;
   I next = 1;
   while (true) {
     if (next > M) {
@@ -50,7 +57,7 @@ void backtrack(I N, I M) {
       }
       I last = sol.back();
       next = last+1;
-      sol.pop_back();
+      remove_last();
       continue;
     }
     if (try_append(next) != 0) {
@@ -61,7 +68,7 @@ void backtrack(I N, I M) {
     next++;
     if (active == N) {
       report_solution();
-      sol.pop_back();
+      remove_last();
     }
   }
 }
