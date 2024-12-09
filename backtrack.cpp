@@ -2,11 +2,13 @@
 
 using namespace std;
 
-#define I uint32_t
+#define I int32_t
 
 #define active (sol.size())
 
-I on[1234];
+vector<I> ans = {0, 1, 2, 4, 7, 13, 24, 44, 84, 161, 10};
+
+I on[4234];
 
 vector<I> sol;
 vector<vector<I>> vecs;
@@ -49,23 +51,24 @@ void backtrack(I N, I M) {
   vecs.resize(N+1);
   vecs[0] = {0};
   on[0] = 1;
-  I next = 1;
+  I next = M;
   while (true) {
-    if (next > M) {
+    if (next - ans[N - active] < 0) {
+      // printf("refuted, active %u next %u\n", active, next);
       if (active == 0) {
         return;
       }
       I last = sol.back();
-      next = last+1;
+      next = last-1;
       remove_last();
       continue;
     }
     if (try_append(next) != 0) {
-      next++;
+      next--;
       continue;
     }
     sol.push_back(next);
-    next++;
+    next--;
     if (active == N) {
       report_solution();
       remove_last();
@@ -74,5 +77,5 @@ void backtrack(I N, I M) {
 }
 
 int main() {
-  backtrack(8, 85);
+  backtrack(9, 161);
 }
