@@ -10,20 +10,26 @@ using namespace std;
 #error "MAX_M not defined"
 #endif
 
-#define MAX_ANS (MAX_M * MAX_N)
+#ifndef DEBUG
+#define DEBUG 0
+#endif
+
+uint64_t tries = 0;
 
 #define I int32_t
 
+constexpr I MAX_ANS = MAX_M * MAX_N - (MAX_N - 1) * (MAX_N) / 2;
+
 #define active (sol.size())
 
-vector<I> ans = {0, 1, 2, 4, 7, 13, 24, 44, 84, 161, 10};
+vector<I> ans = {0, 1, 2, 4, 7, 13, 24, 44, 84, 161, 309, 594, 594};
 
 bitset<MAX_ANS> on;
 
 vector<I> sol;
-vector<vector<I>> vecs;
 
 int try_append(I x) {
+  tries++;
   bitset<MAX_ANS> added = on << x;
   if ((added & on).count()) {
     return -1;
@@ -46,9 +52,6 @@ void remove_last() {
 }
 
 void backtrack(I N, I M) {
-  vecs.clear();
-  vecs.resize(N+1);
-  vecs[0] = {0};
   on[0] = 1;
   I next = M;
   while (true) {
@@ -63,7 +66,7 @@ void backtrack(I N, I M) {
       continue;
     }
     if (active == 0) {
-      printf("trying %u\n", next);
+      printf("trying %u, tries %lu\n", next, tries);
       fflush(stdout);
     }
     if (try_append(next) != 0) {
