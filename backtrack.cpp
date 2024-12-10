@@ -2,33 +2,33 @@
 
 using namespace std;
 
+#ifndef MAX_N
+#error "MAX_N not defined"
+#endif
+
+#ifndef MAX_M
+#error "MAX_M not defined"
+#endif
+
+#define MAX_ANS (MAX_M * MAX_N)
+
 #define I int32_t
 
 #define active (sol.size())
 
 vector<I> ans = {0, 1, 2, 4, 7, 13, 24, 44, 84, 161, 10};
 
-I on[4234];
+bitset<MAX_ANS> on;
 
 vector<I> sol;
 vector<vector<I>> vecs;
 
 int try_append(I x) {
-  vecs[active+1].clear();
-  for (I i=0;i<active+1;i++) {
-    for (I v:vecs[i]) {
-      I here=x+v;
-      if (on[here]) {
-        for (I d:vecs[active+1]) {
-          on[d] = 0;
-        }
-        vecs[active+1].clear();
-        return -1;
-      }
-      vecs[active+1].push_back(here);
-      on[here]=1;
-    }
+  bitset<MAX_ANS> added = on << x;
+  if ((added & on).count()) {
+    return -1;
   }
+  on |= added;
   return 0;
 }
 
@@ -41,9 +41,7 @@ void report_solution() {
 }
 
 void remove_last() {
-  for (I v:vecs[active]) {
-    on[v] = 0;
-  }
+  on &= on >> sol.back();
   sol.pop_back();
 }
 
@@ -55,7 +53,7 @@ void backtrack(I N, I M) {
   I next = M;
   while (true) {
     if (next - ans[N - active] < 0) {
-      // printf("refuted, active %u next %u\n", active, next);
+      // printf("refuted, active %lu next %u\n", active, next);
       if (active == 0) {
         return;
       }
@@ -64,8 +62,8 @@ void backtrack(I N, I M) {
       remove_last();
       continue;
     }
-    if (active == 3) {
-      printf("trying %u %u %u, next %u\n", sol[0], sol[1], sol[2], next);
+    if (active == 0) {
+      printf("trying %u\n", next);
       fflush(stdout);
     }
     if (try_append(next) != 0) {
@@ -82,5 +80,5 @@ void backtrack(I N, I M) {
 }
 
 int main() {
-  backtrack(10, 309);
+  backtrack(MAX_N, MAX_M);
 }
