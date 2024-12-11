@@ -18,6 +18,10 @@ using namespace std;
 #define DEPTH 1
 #endif
 
+#ifndef JOBS
+#define JOBS 1
+#endif
+
 uint64_t tries = 0;
 uint64_t found = 0;
 thread_local uint64_t thread_tries = 0;
@@ -29,7 +33,7 @@ constexpr I MAX_ANS = MAX_M * MAX_N - (MAX_N - 1) * (MAX_N) / 2;
 
 #define active (sol.size())
 
-vector<I> ans = {0, 1, 2, 4, 7, 13, 24, 44, 84, 161, 9, 594, 594};
+vector<I> ans = {0, 1, 2, 4, 7, 13, 24, 44, 84, 161, 309, 594, 1159};
 
 thread_local bitset<MAX_ANS> on;
 
@@ -67,7 +71,7 @@ void remove_last() {
 }
 
 void launch_thread(vector<I> start, I N, I M, thread_status *status) {
-  printf("started with %u\n", start[0]);
+  // printf("started with %u\n", start[0]);
   sol = start;
   on.set(1);
   status->tries = 0;
@@ -75,6 +79,7 @@ void launch_thread(vector<I> start, I N, I M, thread_status *status) {
   for (I x:start) {
     if (try_append(x)) {
       status->running = 0;
+      // printf("finished with %u\n", start[0]);
       return;
     }
   }
@@ -90,7 +95,7 @@ void launch_thread(vector<I> start, I N, I M, thread_status *status) {
       remove_last();
       continue;
     }
-    if (active == sol.size() - 1) {
+    if (active == start.size() - 1) {
       break;
     }
     if (try_append(next) != 0) {
@@ -107,6 +112,7 @@ void launch_thread(vector<I> start, I N, I M, thread_status *status) {
   status->tries = thread_tries;
   status->found = thread_found;
   status->running = 0;
+  // printf("finished with %u\n", start[0]);
 }
 
 int get_next(I N, I M, I depth, vector<I> &vec) {
@@ -187,5 +193,6 @@ void backtrack(I N, I M, I num_jobs) {
 }
 
 int main() {
-  backtrack(MAX_N, MAX_M, 10);
+  ans[MAX_N] = ans[MAX_N-1]-1;
+  backtrack(MAX_N, MAX_M, JOBS);
 }

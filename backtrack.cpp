@@ -83,5 +83,6 @@ void backtrack(I N, I M) {
 }
 
 int main() {
+  ans[MAX_N] = ans[MAX_N-1]-1;
   backtrack(MAX_N, MAX_M);
 }
